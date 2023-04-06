@@ -1,0 +1,3 @@
+# Ignore all files and folders in shapefiles/ directory
+shapefiles/*
+!shapefiles/.gitignore
