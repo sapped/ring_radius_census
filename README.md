@@ -1,5 +1,9 @@
 RENAME THE FOLDER FROM census_db to census_ring_radius
 
+# Setup
+- This project will require significant compute, memory, and disk space
+- You may need to tweak your Docker System Resources before starting, or else you may run into virtual storage limit issues
+
 # Download the Census Data from ftp.census.gov
 - I coded this on a Macbook Air, I needed to [install FTP on mac OS](https://apple.stackexchange.com/questions/320781/missing-ftp-command-line-tool-on-macos) using `brew install inetutils`
 - Ran into some frustration with CLI FTP early on, so I switched and used FileZilla instead
@@ -156,24 +160,24 @@ FROM
 - And now let's add centroids on our tiger2021_tabblock20 dataset. The code below uses batches to loop through the dataset, because the single query required 2:27:08.121 to run on my Macbook Air M2. You may want to modify the batch_size for your particular machine:
 ```sql
   DO $$
-DECLARE
-  updated_rows INTEGER := 1;
-  batch_size INTEGER := 1000; -- Adjust the batch size to a suitable value based on your system's resources
-  BEGIN
-    WHILE updated_rows > 0
-    LOOP
-      UPDATE tiger2021_tabblock20
-      SET centroid = ST_Centroid(geom)
-      WHERE gid IN (
-        SELECT gid FROM tiger2021_tabblock20
-        WHERE centroid IS NULL
-        LIMIT batch_size
-      );
-      
-      GET DIAGNOSTICS updated_rows = ROW_COUNT;
-      COMMIT;
-      PERFORM pg_sleep(1); -- Optional: Sleep for 1 second between batches to reduce system load
-    END LOOP;
+    DECLARE
+      updated_rows INTEGER := 1;
+      batch_size INTEGER := 1000; -- Adjust the batch size to a suitable value based on your system's resources
+    BEGIN
+      WHILE updated_rows > 0
+      LOOP
+        UPDATE tiger2021_tabblock20
+        SET centroid = ST_Centroid(geom)
+        WHERE gid IN (
+          SELECT gid FROM tiger2021_tabblock20
+          WHERE centroid IS NULL
+          LIMIT batch_size
+        );
+        
+        GET DIAGNOSTICS updated_rows = ROW_COUNT;
+        COMMIT;
+        PERFORM pg_sleep(1); -- Optional: Sleep for 1 second between batches to reduce system load
+      END LOOP;
   END $$;
 ```
 
