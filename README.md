@@ -8,16 +8,16 @@ RENAME THE FOLDER FROM census_db to census_ring_radius
 - I coded this on a Macbook Air, I needed to [install FTP on mac OS](https://apple.stackexchange.com/questions/320781/missing-ftp-command-line-tool-on-macos) using `brew install inetutils`
 - Ran into some frustration with CLI FTP early on, so I switched and used FileZilla instead
 - Looks like the Census provides a [Web Interface](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.2021.html#list-tab-790442341), though I didn't test that out
-- You can translate the FTP instructions in this [seminal tutorial by Will Cadell](https://sparkgeo.com/blog/building-a-us-census-tracts-postgis-database/) to get FTP working with FileZilla, or with your CLI FTP client should you choose that route
-- That tutorial relied on the Tract-level data. However, I'm focusing on block group data (most granular)
-- So the folder I want to locate from the Census Bureau's ftp.census.gov is located in [geo/tiger/TIGER2021/TABBLOCK20](https://www2.census.gov/geo/tiger/TIGER2021/TABBLOCK20/). I know this because I looked at the [definitions file](https://www2.census.gov/geo/tiger/TIGER2021/2021_TL_Shapefiles_File_Name_Definitions.pdf) from the [TIGER2021 directory](https://www2.census.gov/geo/tiger/TIGER2021/)
-- I will match the census bureau's folder hierarchy in my source code, so this will all go in shapefiles/TIGER2021/TABBLOCK20. Go ahead and move into this directory. Once it's all downloaded via FTP (could take a bit, since the files are pretty large), unzip everything 
+- You can translate the FTP instructions in this [tutorial by Will Cadell](https://sparkgeo.com/blog/building-a-us-census-tracts-postgis-database/) to get FTP working with FileZilla, or with your CLI FTP client should you choose that route
+- That tutorial relied on the Tract-level data. However, I'm focusing on both tract-level data (tiger2021_tract) and block group data (most granular, tiger2021_tabblock20)
+- So the folder I want to locate from the Census Bureau's ftp.census.gov is located in their FTP directory [geo/tiger/TIGER2021/TABBLOCK20](https://www2.census.gov/geo/tiger/TIGER2021/TABBLOCK20/). I know this because I looked at the [definitions file](https://www2.census.gov/geo/tiger/TIGER2021/2021_TL_Shapefiles_File_Name_Definitions.pdf) from the [TIGER2021 Directory](https://www2.census.gov/geo/tiger/TIGER2021/)
+- I will match the Census Bureau's folder hierarchy in my source code, so this will all go in shapefiles/TIGER2021/TABBLOCK20. Go ahead and move into this directory. Once it's all downloaded via FTP (could take a bit, since the files are pretty large), unzip everything 
 
 ```sh
   unzip \*.zip
 ```
 
-- The above command is for Mac OS, where you need to escape the *. On Linux, I believe you just remove the '\' from teh above command
+- The above command is for Mac OS, where you need to escape the *. On Linux, I believe you just remove the '\' from the above command
 - Feel free to delete all the ZIP files once they're all unzipped. On Mac OS, I did this in the directory with
 
 ```sh
@@ -315,5 +315,34 @@ Once it's finished, though, let's just confirm that you have no null entries in 
 ```
 
 # Download the actual Demographic Data
+- We're going to use the American Community Survey 5-Year Estimate (ACS5) data for 2021.
+- We're using 2021 because it's (i) the most recently available dataset, and (ii) our shapefiles are for 2021 (hence the prefix "tiger2021_" in our shapefile table names)
+- Here is the link for [the Census Bureau's ACS5 FTP access](https://www.census.gov/programs-surveys/acs/data/data-via-ftp.html)
+- Navigate to the folder [programs-surveys/acs/summary_file](https://www2.census.gov/programs-surveys/acs/summary_file/) via FileZilla (or however you wish to navigate FTP)
+- We have the choice between two types of summary-file data structure: table-based-SF and sequence-based-SF. Cool, what does that even mean?
+- Table-based summary files are organized by subject area and topic. Easier to navigate and understand for users who are interested in a specific topic or subject. Better suited for users who need to access only a small number of specific tables.
+- Sequenced-based summary files are organized by geographic area and sequence number (a local grouping of data tables), provide a more compact and efficient way to access large amounts of data, and are better suited for users who need to access many tables for a specific geographic area or users who are working with the entire dataset.
+- Alright, let's use the sequence-based files, grabbing all of the files from [this folder in the Census Bureau FTP](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/)
+- The filenames are [2021_ACS_Geography_Files.zip](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/2021_ACS_Geography_Files.zip), [All_Geographies_Not_Tracts_Block_Groups.zip](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/All_Geographies_Not_Tracts_Block_Groups.zip), and [Tracts Block Groups Only.zip](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/Tracts_Block_Groups_Only.zip)
+- Again, let's roughly mimic the Census filepath conventions `./acs_summary_file/2021/sequence-based-SF/data/5YRData`
+- Once downloaded via FTP, let's unzip all the ZIPs
+```sh
+  unzip \*.zip
+```
 
-# Build API that Performs Ring Radius Analysis at block level
+- Then once unzipped, delete all the ZIPs
+```sh
+  find . -type f -name "*.zip" -delete
+```
+
+# Geocode Address Entries
+
+# Pair Demographic Data with GeoJSON as Properties
+
+# Perform the Ring Radius Analysis in SQL
+
+# Optimize SQL queries and ensure proper indexing for faster performance
+
+# Build API to Performs All Key Functions
+
+# Test and validate the API with sample data

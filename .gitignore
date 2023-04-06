@@ -1,3 +1,5 @@
 # Ignore all files and folders in shapefiles/ directory
 shapefiles/*
 !shapefiles/.gitignore
+acs_summary_file/*
+!acs_summary_file/.gitignore
