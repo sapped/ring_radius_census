@@ -326,13 +326,18 @@ Once it's finished, though, let's just confirm that you have no null entries in 
 - The filenames are [2021_ACS_Geography_Files.zip](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/2021_ACS_Geography_Files.zip), [All_Geographies_Not_Tracts_Block_Groups.zip](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/All_Geographies_Not_Tracts_Block_Groups.zip), and [Tracts Block Groups Only.zip](https://www2.census.gov/programs-surveys/acs/summary_file/2021/sequence-based-SF/data/5_year_entire_sf/Tracts_Block_Groups_Only.zip)
 - Again, let's roughly mimic the Census filepath conventions `./acs_summary_file/2021/sequence-based-SF/data/5YRData`
 - Once downloaded via FTP, let's unzip all the ZIPs
+
+- This is a special `unzip` command that recursively unzips each zipfile and maintains the directory structure
+- I had to run it 2 times total, because the ZIP files themselves contained ZIP files
+- Or you can just keep running until it just lists all the ZIP files, but doesn't overwrite them (because we use the `-n` option in the bash command)
+
 ```sh
-  unzip \*.zip
+  find . -type f -name '*.zip' -exec sh -c 'd="$(dirname "{}")"; mkdir -p "$d/$(basename "{}" .zip)"; unzip -n -d "$d/$(basename "{}" .zip)" "{}"' \;
 ```
 
-- Then once unzipped, delete all the ZIPs
+- Then once unzipped, recursively delete all the ZIPs. You just have to run this once.
 ```sh
-  find . -type f -name "*.zip" -delete
+  find . -type f -name '*.zip' -exec rm {} \;
 ```
 
 # Geocode Address Entries
