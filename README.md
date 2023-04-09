@@ -319,6 +319,7 @@ Once it's finished, though, let's just confirm that you have no null entries in 
 - We're using 2021 because it's (i) the most recently available dataset, and (ii) our shapefiles are for 2021 (hence the prefix "tiger2021_" in our shapefile table names)
 - Here is the link for [the Census Bureau's ACS5 FTP access](https://www.census.gov/programs-surveys/acs/data/data-via-ftp.html)
 - Navigate to the folder [programs-surveys/acs/summary_file](https://www2.census.gov/programs-surveys/acs/summary_file/) via FileZilla (or however you wish to navigate FTP)
+acs_summary-file_handbook_2019_ch02.pdf)
 - We have the choice between two types of summary-file data structure: table-based-SF and sequence-based-SF. Cool, what does that even mean?
 - Table-based summary files are organized by subject area and topic. Easier to navigate and understand for users who are interested in a specific topic or subject. Better suited for users who need to access only a small number of specific tables.
 - Sequenced-based summary files are organized by geographic area and sequence number (a local grouping of data tables), provide a more compact and efficient way to access large amounts of data, and are better suited for users who need to access many tables for a specific geographic area or users who are working with the entire dataset.
@@ -338,6 +339,22 @@ Once it's finished, though, let's just confirm that you have no null entries in 
 - Then once unzipped, recursively delete all the ZIPs. You just have to run this once.
 ```sh
   find . -type f -name '*.zip' -exec rm {} \;
+```
+
+- FYI only, in case you want to copy-paste the folder structure. You can navigate to the 5_year_entire_sf dataset and copy the general folder structure. I found this easier to review than clicking open every single file to build my psql import. Note `pbcopy` is a mac os command, just replace with the appropriate command to copy to your keyboard for your OS.
+```sh
+gfind . -type d -exec sh -c 'echo "{}"; ls -U "{}" | head -n 2 | sed "s/^/    /"' \; | pbcopy
+```
+
+# What are we looking at?
+- This is a lot of data
+- I'd recommend scanning through this Census PDF, [how to use the ACS summary file](https://www.census.gov/content/dam/Census/library/publications/2019/acs/
+
+# TBU Bash Script
+
+- OK now let's try to import all the data with our fancy bash script:
+```sh
+docker exec -it postgis_container bash -c "./import_acs5_sf.sh"
 ```
 
 # Geocode Address Entries
